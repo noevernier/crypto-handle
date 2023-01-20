@@ -16,10 +16,12 @@ struct CoinRowView: View {
         HStack(spacing: 0) {
             leftColumn
             Spacer()
-            if showHoldingColumn {
-                centerColumn
+            HStack (alignment: .top) {
+                if showHoldingColumn {
+                    centerColumn
+                }
+                rightColumn
             }
-            rightColumn
         }
         .font(.headline)
     }
@@ -46,34 +48,47 @@ extension CoinRowView {
                 .font(.caption)
                 .foregroundColor(Color.theme.secondaryText)
                 .frame(minWidth: 30)
+                .fontWeight(.heavy)
             CoinImageView(coin: coin)
                 .frame(width: 30, height: 30)
-            Text(coin.symbol.uppercased())
-                .font(.headline)
-                .padding(.leading, 6)
-                .foregroundColor(Color.theme.accent)
+            VStack (alignment: .leading){
+                Text(coin.symbol.uppercased())
+                    .font(.headline)
+                    .fontWeight(.heavy)
+                    .foregroundColor(Color.theme.accent)
+                Text(coin.name)
+                    .font(.caption)
+                    .foregroundColor(Color.theme.secondaryText)
+            }.padding(6)
         }
     }
     
     private var centerColumn: some View {
         VStack (alignment: .trailing){
             Text(coin.currentHoldingValue.asCurrencyWith2Decimals())
-                .bold()
+                .fontWeight(.heavy)
             Text((coin.currentHoldings ?? 0).asNumberString())
         }
         .foregroundColor(Color.theme.accent)
     }
     
     private var rightColumn: some View {
-        VStack (alignment: .trailing){
+        VStack (alignment: .trailing, spacing: 3){
             Text(coin.currentPrice.asCurrencyWith6Decimals())
-                .bold()
+                .fontWeight(.heavy)
                 .foregroundColor(Color.theme.accent)
-            Text((coin.priceChangePercentage24H ?? 0).asPercentString())
-                .foregroundColor(
-                    (coin.priceChangePercentage24H ?? 0) >= 0 ?
-                    Color.theme.green :
-                        Color.theme.red)
+            Text(((coin.priceChangePercentage24H ?? 0) >= 0 ? "+ " : "- ") + (coin.priceChangePercentage24H ?? 0).asPercentString())
+                .font(.footnote)
+                .fontWeight(.bold)
+                .padding(5)
+                .frame(width: UIScreen.main.bounds.width/5.5, height: 25, alignment: .trailing)
+                .background(
+                    RoundedRectangle(cornerRadius: 5)
+                        .fill((coin.priceChangePercentage24H ?? 0) >= 0 ?
+                              Color.green :
+                                  Color.red)
+                )
+                .foregroundColor(Color.white)
         }
         .frame(width: UIScreen.main.bounds.width/3.5, alignment: .trailing)
     }
